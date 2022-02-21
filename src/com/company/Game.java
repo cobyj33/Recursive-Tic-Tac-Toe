@@ -15,6 +15,7 @@ public abstract class Game {
     public abstract Player findWinner();
     public abstract boolean isTied();
     public abstract void reset();
+    public abstract int getDepth();
 
     public boolean isFinished() {
         if (winner == Player.NONE)

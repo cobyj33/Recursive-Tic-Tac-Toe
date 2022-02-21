@@ -1,12 +1,13 @@
 package com.company;
 
-import java.util.Arrays;
-
 public class LeafGame extends Game {
     Player[][] board;
+    private int depth;
 
     LeafGame(Game parent) {
         super(parent);
+        if (parent instanceof InteriorGame)
+            depth = ( (InteriorGame) parent).getDepth() + 1;
         construct();
     }
 
@@ -89,5 +90,9 @@ public class LeafGame extends Game {
         }
 
         return true;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 }

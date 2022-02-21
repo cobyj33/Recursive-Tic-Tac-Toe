@@ -133,7 +133,6 @@ public class GUIResources {
 		}
 
 		protected void paintComponent(Graphics g) {
-			super.paintComponent(g);
 			Graphics2D g2D = (Graphics2D) g;
 			g2D.setFont(font);
 			g2D.setPaint(textColor);
@@ -215,16 +214,19 @@ public class GUIResources {
 			return -1;
 		}
 
-		public String getLabelText() {
+		@Override
+		public String getText() {
 			return text;
+		}
+
+		@Override
+		public void setText(String text) {
+			this.text = text;
+			repaint();
 		}
 
 		public float getPreferredFontSize() {
 			return preferredFontSize;
-		}
-
-		public void setLabelText(String text) {
-			this.text = text;
 		}
 
 		public void setPreferredFontSize(float preferredFontSize) {

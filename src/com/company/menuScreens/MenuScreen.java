@@ -61,7 +61,7 @@ public class MenuScreen extends JPanel {
         TitleArea(String title) {
             this.title = title;
             topOffset = 0;
-            animator = new javax.swing.Timer(100, l -> repaint());
+            animator = new javax.swing.Timer(75, l -> repaint());
             setOpaque(false);
 
             addAncestorListener(new AncestorListener() {

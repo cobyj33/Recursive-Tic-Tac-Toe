@@ -1,11 +1,9 @@
 package com.company;
 
-import java.util.Arrays;
-
 public class InteriorGame extends Game {
     Game[][] board;
-    private int currentDepth;
-    private int maxDepth;
+    private final int currentDepth;
+    private final int maxDepth;
 
     InteriorGame(Game parent, int currentDepth, int maxDepth) {
         super(parent);
@@ -62,9 +60,9 @@ public class InteriorGame extends Game {
 
     @Override
     public Player findWinner() {
-        for (int row = 0; row < board.length; row++) {
-            if ((board[row][0].getWinner() == board[row][1].getWinner() && board[row][1].getWinner() == board[row][2].getWinner()) && board[row][0].getWinner() != Player.NONE) {
-                return board[row][0].getWinner();
+        for (Game[] row : board) {
+            if ((row[0].getWinner() == row[1].getWinner() && row[1].getWinner() == row[2].getWinner()) && row[0].getWinner() != Player.NONE) {
+                return row[0].getWinner();
             }
         }
 
@@ -98,13 +96,18 @@ public class InteriorGame extends Game {
         if (winner != Player.NONE)
             return false;
 
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board[row].length; col++) {
-                if (board[row][col].getWinner() == Player.NONE)
+        for (Game[] row : board) {
+            for (Game child : row) {
+                if (child.getWinner() == Player.NONE)
                     return false;
             }
         }
 
         return true;
     }
+
+    public int getDepth() {
+        return currentDepth;
+    }
+
 }

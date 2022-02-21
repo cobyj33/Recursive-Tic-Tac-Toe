@@ -52,6 +52,7 @@ public class Display extends JPanel {
             renderHoveredGameChoice(g2D);
             renderGame(g2D, game.getCurrentGame(), new Rectangle(0, 0, getWidth(), getHeight()), 0);
             drawCurrentPlayerDisplay(g2D);
+            drawCurrentDepthDisplay(g2D);
 
             if (game.canBacktrack()) {
                 drawBackTrackArea(g2D);
@@ -94,7 +95,7 @@ public class Display extends JPanel {
         if (currentGame == null) {
             System.out.println("[Display.renderGame()] FATAL: HIT NULL GAME");
             return;
-        } else if (gameDimensions.width < 20 || gameDimensions.height < 20) {
+        } else if (gameDimensions.width < 5 || gameDimensions.height < 5) {
             System.out.println("[Display.renderGame()] Reached maximum render depth");
             return;
         }
@@ -108,7 +109,6 @@ public class Display extends JPanel {
             return;
         }
 
-        drawGrid(g2D, gameDimensions, depth);
         Dimension childGameDimensions = new Dimension(gameDimensions.width / 3, gameDimensions.height / 3);
         if (currentGame instanceof LeafGame) {
             for (int i = 0; i < 9; i++) {
@@ -129,6 +129,8 @@ public class Display extends JPanel {
                 renderGame(g2D, ( (InteriorGame) currentGame).getGameAt(currentRow, currentCol), new Rectangle(gamePos.x, gamePos.y, childGameDimensions.width, childGameDimensions.height), depth + 1);
             }
         }
+
+        drawGrid(g2D, gameDimensions, depth);
     }
 
     private void drawX(Graphics2D g2D, Rectangle bounds) {
@@ -277,6 +279,42 @@ public class Display extends JPanel {
         g2D.setComposite(originalComposite);
     }
 
+    private void drawCurrentDepthDisplay(Graphics2D g2D) {
+        Stroke originalStroke = g2D.getStroke();
+        Paint originalPaint = g2D.getPaint();
+        Composite originalComposite = g2D.getComposite();
+        Font originalFont = g2D.getFont();
+
+        Dimension currentDepthDisplayDimension = new Dimension(getWidth() / 10, getHeight() / 10);
+        int yMargin = 10;
+        Rectangle currentDepthDisplay = new Rectangle(getWidth() / 2 - currentDepthDisplayDimension.width / 2, getHeight() - currentDepthDisplayDimension.height - yMargin, currentDepthDisplayDimension.width, currentDepthDisplayDimension.height);
+
+        if (currentDepthDisplay.contains(mousePosition)) {
+            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        }
+
+        g2D.setPaint(Color.WHITE);
+        g2D.fill(currentDepthDisplay);
+        g2D.setPaint(Color.BLACK);
+        g2D.setStroke(new BasicStroke(5));
+        g2D.draw(currentDepthDisplay);
+
+        FontMetrics metrics = g2D.getFontMetrics();
+        String prompt = "" + game.getCurrentGame().getDepth();
+
+        while (metrics.stringWidth(prompt) < currentDepthDisplay.width && metrics.getHeight() < currentDepthDisplay.height) {
+            g2D.setFont(g2D.getFont().deriveFont( g2D.getFont().getSize() + 1f ));
+            metrics = g2D.getFontMetrics();
+        }
+        g2D.setFont(g2D.getFont().deriveFont( g2D.getFont().getSize() - 1f ));
+        metrics = g2D.getFontMetrics();
+        g2D.drawString(prompt, currentDepthDisplay.x + currentDepthDisplay.width / 2 - metrics.stringWidth(prompt) / 2, currentDepthDisplay.y + currentDepthDisplay.height / 2 + metrics.getHeight() / 4);
+
+        g2D.setFont(originalFont);
+        g2D.setStroke(originalStroke);
+        g2D.setPaint(originalPaint);
+        g2D.setComposite(originalComposite);
+    }
     class MouseActions extends MouseAdapter {
         boolean clickActionTaken;
         MouseActions() {}
@@ -288,10 +326,10 @@ public class Display extends JPanel {
                 int selectedRow = selectedGame / 3;
                 int selectedCol = selectedGame % 3;
                 game.chooseSelection(selectedRow, selectedCol);
+                repaint();
             }
             mouseIsPressed = false;
             clickActionTaken = false;
-            repaint();
         }
 
         @Override
@@ -301,16 +339,19 @@ public class Display extends JPanel {
             if (game.canBacktrack() && backTrackButton.contains(e.getPoint())) {
                 game.backtrack();
                 clickActionTaken = true;
+                repaint();
             }
-            repaint();
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
             super.mouseMoved(e);
             mousePosition.setLocation(e.getX(), e.getY());
+            Dimension gameDimension = new Dimension(getWidth() / 3, getHeight() / 3);
+            if (selectedGame >= 0 && selectedGame < 9)
+                repaint(selectedGame % 3 * gameDimension.width, selectedGame / 3 * gameDimension.height, gameDimension.width, gameDimension.height);
             selectedGame = getSelectedArea(e);
-            repaint();
+            repaint(selectedGame % 3 * gameDimension.width, selectedGame / 3 * gameDimension.height, gameDimension.width, gameDimension.height);
         }
 
         @Override

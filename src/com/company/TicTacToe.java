@@ -12,6 +12,7 @@ public class TicTacToe {
     }
 
     private void constructGame() {
+        started = true;
         currentPlayer = Math.random() * 2 < 1 ? Player.X : Player.O;
         if (maxDepth == 0) {
             head = new LeafGame(null);
@@ -81,7 +82,7 @@ public class TicTacToe {
     }
 
     private void win(Player player) {
-
+        started = false;
     }
 
     public void setMaxDepth(int maxDepth) {
