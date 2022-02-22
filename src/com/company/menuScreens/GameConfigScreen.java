@@ -128,6 +128,11 @@ public class GameConfigScreen extends JPanel {
             public void mouseExited(MouseEvent e) {
                 startButtonBackground.setBackground(Color.BLACK);
             }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Resources.playSound(Resources.SoundEnum.BUTTON_CLICK);
+            }
         });
         startButtonBackground.add(startButton);
         add(startButtonBackground, constraints);

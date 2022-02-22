@@ -1,5 +1,6 @@
 package com.company.menuScreens;
 
+import com.company.AncestorAdapter;
 import com.company.GUIResources;
 import com.company.Resources;
 
@@ -64,7 +65,7 @@ public class MenuScreen extends JPanel {
             animator = new javax.swing.Timer(75, l -> repaint());
             setOpaque(false);
 
-            addAncestorListener(new AncestorListener() {
+            addAncestorListener(new AncestorAdapter() {
                 @Override
                 public void ancestorAdded(AncestorEvent ancestorEvent) {
                     animator.restart();
@@ -73,11 +74,6 @@ public class MenuScreen extends JPanel {
                 @Override
                 public void ancestorRemoved(AncestorEvent ancestorEvent) {
                     animator.stop();
-                }
-
-                @Override
-                public void ancestorMoved(AncestorEvent ancestorEvent) {
-
                 }
             });
         }
@@ -94,10 +90,8 @@ public class MenuScreen extends JPanel {
 
             topOffset += metrics.getHeight() * 7 / 64;
             int currentLineHeight = -topOffset;
-            System.out.println("metrics height: " + metrics.getHeight());
             if (topOffset > metrics.getHeight()) {
                 topOffset = 0;
-                System.out.println("topoffset reset");
             }
 
 
@@ -106,7 +100,6 @@ public class MenuScreen extends JPanel {
                 currentLineHeight += metrics.getHeight();
                 g2D.drawString(title, getWidth() / 2 - metrics.stringWidth(title) / 2, currentLineHeight);
                 g2D.setFont(g2D.getFont().deriveFont( g2D.getFont().getSize() * 3 / 5f ));
-                System.out.println(g2D.getFont().getSize());
             }
         }
 
@@ -146,6 +139,11 @@ public class MenuScreen extends JPanel {
                     super.mouseExited(e);
                     setBackground(Color.BLACK);
                     setForeground(Color.CYAN);
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    Resources.playSound(Resources.SoundEnum.BUTTON_CLICK);
                 }
             });
         }

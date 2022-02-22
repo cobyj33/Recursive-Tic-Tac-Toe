@@ -54,7 +54,12 @@ public class InteriorGame extends Game {
         } else if (winner != Player.NONE) {
             System.out.println("[InteriorGame.canPlace()] cannot place piece: game already finished");
             return false;
+        } else if  (board[row][col].getWinner() != Player.NONE) {
+            System.out.println("[LeafGame.canPlace()] cannot place piece: game already won");
+            return false;
         }
+
+
         return true;
     }
 

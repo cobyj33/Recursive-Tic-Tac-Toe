@@ -39,6 +39,9 @@ public class LeafGame extends Game {
         } else if (winner != Player.NONE) {
             System.out.println("[LeafGame.canPlace()] cannot place piece: game already finished");
             return false;
+        } else if  (board[row][col] != Player.NONE) {
+            System.out.println("[LeafGame.canPlace()] cannot place piece: area already occupied");
+            return false;
         }
         return true;
     }

@@ -2,29 +2,35 @@ package com.company;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class Display extends JPanel {
     private TicTacToe game;
     private Color oColor;
     private Color xColor;
     private int selectedGame;
-//    private Game currentDisplayedGame;
     private boolean transitioning;
     private boolean mouseIsPressed;
     private Point mousePosition;
+    private List<Animation> currentAnimations;
 
     private MouseActions mouseActions;
     private KeyActions keyActions;
-    private TransitionInInfo transitionInInfo;
 
     private Rectangle backTrackButton;
 
     public Display(TicTacToe game) {
         this.game = game;
+        game.setGameDisplay(this);
         oColor = Color.BLUE;
         xColor = Color.RED;
         selectedGame = -1;
@@ -33,12 +39,11 @@ public class Display extends JPanel {
 
         mouseActions = new MouseActions();
         keyActions = new KeyActions();
-        transitionInInfo = new TransitionInInfo();
         addMouseListener(mouseActions);
         addMouseMotionListener(mouseActions);
         addKeyListener(keyActions);
-//        currentDisplayedGame = game.getHead();
         backTrackButton = new Rectangle(0, 0, 0, 0);
+        currentAnimations = new ArrayList<>();
     }
 
     @Override
@@ -49,6 +54,8 @@ public class Display extends JPanel {
         if (game.getWinner() != Player.NONE) {
             renderWin(g2D);
         } else {
+
+
             renderHoveredGameChoice(g2D);
             renderGame(g2D, game.getCurrentGame(), new Rectangle(0, 0, getWidth(), getHeight()), 0);
             drawCurrentPlayerDisplay(g2D);
@@ -58,6 +65,10 @@ public class Display extends JPanel {
                 drawBackTrackArea(g2D);
             } else {
                 backTrackButton.setBounds(0, 0, 0, 0);
+            }
+
+            for (Animation animation : currentAnimations) {
+                animation.animate(g2D);
             }
 
         }
@@ -315,6 +326,70 @@ public class Display extends JPanel {
         g2D.setPaint(originalPaint);
         g2D.setComposite(originalComposite);
     }
+
+    private void lockInputs() {
+        removeKeyListener(keyActions);
+        removeMouseListener(mouseActions);
+        removeMouseMotionListener(mouseActions);
+    }
+
+    private void unlockInputs() {
+        if (!Arrays.stream(getKeyListeners()).anyMatch(l -> l.equals(keyActions))) {
+            addKeyListener(keyActions);
+        }
+        if (!Arrays.stream(getMouseListeners()).anyMatch(l -> l.equals(mouseActions))) {
+            addMouseListener(mouseActions);
+        }
+        if (!Arrays.stream(getMouseMotionListeners()).anyMatch(l -> l.equals(mouseActions))) {
+            addMouseMotionListener(mouseActions);
+        }
+    }
+
+    private void startDrawXAnimation(int row, int col) {
+        final Rectangle bounds = getBoundsFromRowAndCol(row, col);
+
+        lockInputs();
+        final DrawXAnimation animation = new DrawXAnimation(bounds);
+        final Runnable callAnimate = () -> SwingUtilities.invokeLater( () -> repaint() );
+        final Runnable endAnimation = () -> SwingUtilities.invokeLater( () -> {
+            game.chooseSelection(row, col);
+            currentAnimations.remove(animation);
+            repaint();
+            unlockInputs();
+        } );
+        final Scheduler.Preferences animationInfo = new Scheduler.Preferences();
+        animationInfo.setCancelTime(animation.getTransitionTime());
+        animationInfo.setLoopTime(animation.getMillisecondsPerFrame());
+        animationInfo.setMainAction(callAnimate);
+        animationInfo.setTimeUnit(TimeUnit.MILLISECONDS);
+        animationInfo.setOnCancel(endAnimation);
+        currentAnimations.add(animation);
+
+        Scheduler.scheduleAtFixedRate(animationInfo);
+    }
+
+    private void startDrawOAnimation(Rectangle bounds) {
+        lockInputs();
+    }
+
+    private void startZoomInAnimation(Rectangle target) {
+        lockInputs();
+    }
+
+    private void startZoomOutAnimation() {
+        lockInputs();
+    }
+
+    private Rectangle getBoundsFromRowAndCol(int row, int col) {
+        int squareWidth = getWidth() / 3;
+        int squareHeight = getHeight() / 3;
+        return new Rectangle(col * squareWidth, row * squareHeight, squareWidth, squareHeight);
+    }
+
+    private int getSelectionFromRowAndCol(int row, int col) {
+        return (row / 3) + (col % 3);
+    }
+
     class MouseActions extends MouseAdapter {
         boolean clickActionTaken;
         MouseActions() {}
@@ -325,7 +400,12 @@ public class Display extends JPanel {
             if (!clickActionTaken) {
                 int selectedRow = selectedGame / 3;
                 int selectedCol = selectedGame % 3;
-                game.chooseSelection(selectedRow, selectedCol);
+//                game.chooseSelection(selectedRow, selectedCol);
+                if (game.getCurrentPlayer() == Player.X) {
+                    startDrawXAnimation(selectedRow, selectedCol);
+                } else {
+                    game.chooseSelection(selectedRow, selectedCol);
+                }
                 repaint();
             }
             mouseIsPressed = false;
@@ -350,7 +430,7 @@ public class Display extends JPanel {
             Dimension gameDimension = new Dimension(getWidth() / 3, getHeight() / 3);
             if (selectedGame >= 0 && selectedGame < 9)
                 repaint(selectedGame % 3 * gameDimension.width, selectedGame / 3 * gameDimension.height, gameDimension.width, gameDimension.height);
-            selectedGame = getSelectedArea(e);
+            selectedGame = getSelectedArea(e.getPoint());
             repaint(selectedGame % 3 * gameDimension.width, selectedGame / 3 * gameDimension.height, gameDimension.width, gameDimension.height);
         }
 
@@ -367,8 +447,8 @@ public class Display extends JPanel {
             repaint();
         }
 
-        private int getSelectedArea(MouseEvent e) {
-            return (e.getX() / (getWidth() / 3)) + (e.getY() / (getHeight() / 3) * 3);
+        private int getSelectedArea(Point point) {
+            return (point.x / (getWidth() / 3)) + (point.y / (getHeight() / 3) * 3);
         }
     }
 
@@ -376,26 +456,115 @@ public class Display extends JPanel {
         KeyActions() {}
     }
 
-    private class TransitionInInfo {
-        public int frames = 10;
-        public int transitionTime = 200;
+    private abstract class Animation {
+        private int maxFrames;
+        private int currentFrame;
+        private int transitionTime;
+        private Instant lastFrameInstant;
 
-        TransitionInInfo() {}
+        Animation(int maxFrames, int transitionTime) {
+            this.maxFrames = maxFrames;
+            this.transitionTime = transitionTime;
+            lastFrameInstant = Instant.now();
+        }
+
+        public void animate(Graphics2D g2D) {
+            if (canUpdate()) {
+                for (int i = 0; i < getFramesSinceLastFrame(); i++) {
+                    update();
+                }
+                lastFrameInstant = Instant.now();
+            }
+            draw(g2D);
+        }
+
+        public boolean isCompleted() {
+            if (currentFrame >= maxFrames)
+                return true;
+            return false;
+        }
+
+        public int getTransitionTime() {
+            return transitionTime;
+        }
+
         public int getMillisecondsPerFrame() {
-            return transitionTime / frames;
+            return transitionTime / maxFrames;
         }
 
-        public int getXMovementPerFrame() {
-            return (getWidth() - getWidth() / 3) / frames;
+        protected int getMaxFrames() {
+            return maxFrames;
         }
 
-        public int getYMovementPerFrame() {
-            return (getHeight() - getHeight() / 3) / frames;
+        protected boolean canUpdate() {
+            if (Duration.between(lastFrameInstant, Instant.now()).toMillisPart() >= getMillisecondsPerFrame())
+                return true;
+            return false;
+        }
+
+        private int getFramesSinceLastFrame() {
+            return Duration.between(lastFrameInstant, Instant.now()).toMillisPart() / getMillisecondsPerFrame();
+        }
+
+        public abstract void update();
+        public abstract void draw(Graphics2D g2D);
+    }
+
+    private class DrawXAnimation extends Animation {
+
+        Rectangle drawingBounds;
+        private int desiredLineWidth, desiredLineHeight,
+                currentLineWidth, currentLineHeight,
+                xPadding, yPadding, strokeSize;
+
+        DrawXAnimation(Rectangle bounds) {
+            super(10, 150);
+            this.drawingBounds = bounds;
+            currentLineWidth = 0;
+            currentLineHeight = 0;
+            strokeSize = Math.min(drawingBounds.width / 50, drawingBounds.height / 50);
+            xPadding = drawingBounds.width / 10;
+            yPadding = drawingBounds.height / 10;
+            desiredLineWidth = bounds.width - (xPadding * 2);
+            desiredLineHeight = bounds.height - (yPadding * 2);
+        }
+
+        @Override
+        public void update() {
+            currentLineWidth += desiredLineWidth / getMaxFrames();
+            currentLineHeight += desiredLineHeight / getMaxFrames();
+        }
+
+        @Override
+        public void draw(Graphics2D g2D) {
+            Stroke originalStroke = g2D.getStroke();
+            Paint originalPaint = g2D.getPaint();
+            Composite originalComposite = g2D.getComposite();
+            g2D.setStroke(new BasicStroke(strokeSize));
+            g2D.setPaint(xColor);
+
+            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+            g2D.fill(new Rectangle(drawingBounds.x, drawingBounds.y, drawingBounds.width, currentLineHeight + yPadding));
+            g2D.setComposite(originalComposite);
+
+            g2D.drawLine(drawingBounds.x + xPadding, drawingBounds.y + yPadding, drawingBounds.x + xPadding + currentLineWidth, drawingBounds.y + yPadding + currentLineHeight);
+            g2D.drawLine(drawingBounds.x + drawingBounds.width - xPadding, drawingBounds.y + yPadding, drawingBounds.x + drawingBounds.width - xPadding - currentLineWidth, drawingBounds.y + yPadding + currentLineHeight);
+
+            g2D.setStroke(originalStroke);
+            g2D.setPaint(originalPaint);
         }
     }
 
-    private class TransitionOutInfo {
-
-    }
+//    private class DrawOAnimation extends Animation {
+//
+//    }
+//
+//    private class ZoomInAnimation extends Animation {
+//
+//    }
+//
+//    private class ZoomOutAnimation extends Animation {
+//
+//    }
 
 }

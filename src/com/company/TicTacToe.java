@@ -1,10 +1,13 @@
 package com.company;
 
+import javax.swing.*;
+
 public class TicTacToe {
     private Game head;
     private int maxDepth;
     private Player currentPlayer;
     private Game currentGame;
+    private Display gameDisplay;
     boolean started;
 
     public TicTacToe(int maxDepth) {
@@ -111,5 +114,9 @@ public class TicTacToe {
 
     public Player getWinner() {
         return head.getWinner();
+    }
+
+    public void setGameDisplay(Display display) {
+        this.gameDisplay = display;
     }
 }

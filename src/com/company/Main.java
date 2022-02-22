@@ -7,6 +7,8 @@ import com.company.menuScreens.ScreenManager;
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -182,5 +184,4 @@ public class Main {
         }
 
     }
-
 }

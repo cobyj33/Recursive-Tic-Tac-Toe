@@ -8,7 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Resources {
     private static Map<ImageEnum, BufferedImage> ImageMap = new EnumMap<>(ImageEnum.class);
@@ -26,7 +29,7 @@ public class Resources {
     }
 
     public static enum SoundEnum {
-
+        BUTTON_CLICK;
     }
 
 
@@ -43,10 +46,30 @@ public class Resources {
         }
 
         try {
+            Clip buttonClick = createSoundClip("res/button click.wav");
+            SoundMap.put(SoundEnum.BUTTON_CLICK, buttonClick);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
+        try {
             FontMap.put(FontEnum.STANDARD, Font.createFont(Font.TRUETYPE_FONT, new File("res/Shizuru-Regular.ttf")));
         } catch (Exception e1) {
             e1.printStackTrace();
         }
+    }
+
+    private static Clip createSoundClip(String path) {
+        Clip current = null;
+        try {
+            current = AudioSystem.getClip();
+            current.open(AudioSystem.getAudioInputStream(new File(path)));
+        } catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
+            System.out.println("COULD NOT READ SOUND FILE: " + path);
+            e.printStackTrace();
+        }
+
+        return current;
     }
 
     private static BufferedImage getSprite(BufferedImage sheet, int row, int col) {
