@@ -1,10 +1,11 @@
-# Recursive Tic-Tac-Toe
+# ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Recursive Tic-Tac-Toe ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png)
 A pit of Tic-Tac-Toe games of N depth
 
 
 Works through a 9-node tree (non-tree?) where each node has a won or lost state, which changes depending on its children, or if it is a leaf node, depending on the result of its game.
 As you can see from these visualizations of a game between depths of 2 and 3, the tree gets pretty large, pretty fast
 
+![1 Depth Tree Display](<1 depth tree.PNG>)
 ![2 Depth Tree Display](<2 depth tree.PNG>)
 ![3 Depth Tree Display](<3 depth tree.PNG>)
 
