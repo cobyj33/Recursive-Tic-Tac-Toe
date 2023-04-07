@@ -6,10 +6,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import rttt.GUIResources;
-import rttt.Resources;
-import rttt.AncestorAdapter;
-
 public class MenuScreen extends JPanel {
     TitleArea title;
     JButton playButton;

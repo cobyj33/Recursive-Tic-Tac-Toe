@@ -2,18 +2,11 @@ package rttt;
 
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import rttt.GUIResources;
-import rttt.TicTacToe;
-import rttt.Display;
-import rttt.Resources;
-
 
 public class GameConfigScreen extends JPanel {
     JLabel playLabel;

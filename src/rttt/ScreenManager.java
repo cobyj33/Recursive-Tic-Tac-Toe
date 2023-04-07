@@ -1,7 +1,6 @@
 package rttt;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JPanel;

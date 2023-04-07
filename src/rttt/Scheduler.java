@@ -6,14 +6,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.prefs.Preferences;
 
 public class Scheduler {
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
     private Scheduler() {}
 
-    public static void scheduleAtFixedRate(Preferences choices) {
+    public static <T> void scheduleAtFixedRate(Preferences<T> choices) {
         Future<?> task = scheduler.scheduleAtFixedRate(choices.getMainAction(), choices.getInitialDelayTime(), choices.getLoopTime(), choices.getTimeUnit());
 
         scheduler.schedule( () -> {
@@ -22,23 +21,7 @@ public class Scheduler {
         }, choices.getCancelTime(), choices.getTimeUnit());
     }
 
-    public static void scheduleUntil(Preferences preferences) {
-        Runnable cancelTask = () -> {
-
-        };
-
-        Runnable loop = () -> {
-            if (preferences.getCondition().test(preferences.getTestObject())) {
-                cancelTask.run();
-            } else {
-                preferences.getMainAction().run();
-            }
-        };
-
-//        Scheduler.scheduleAtFixedRate
-    }
-
-    public static void scheduleWithFixedDelay(Preferences choices) {
+    public static <T> void scheduleWithFixedDelay(Preferences<T> choices) {
         Future<?> task = scheduler.scheduleWithFixedDelay(choices.getMainAction(), choices.getInitialDelayTime(), choices.getLoopTime(), choices.getTimeUnit());
 
         scheduler.schedule( () -> {

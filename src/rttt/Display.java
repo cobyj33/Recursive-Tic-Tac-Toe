@@ -7,7 +7,6 @@ import java.util.List;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ public class Display extends JPanel {
     private Color oColor;
     private Color xColor;
     private int selectedGame;
-    private boolean transitioning;
     private boolean mouseIsPressed;
     private Point mousePosition;
     private List<Animation> currentAnimations;
@@ -31,7 +29,6 @@ public class Display extends JPanel {
 
     public Display(TicTacToe game) {
         this.game = game;
-        game.setGameDisplay(this);
         oColor = Color.BLUE;
         xColor = Color.RED;
         selectedGame = -1;
@@ -85,22 +82,6 @@ public class Display extends JPanel {
         FontMetrics metrics = g2D.getFontMetrics();
         String winPrompt = "Player " + game.getWinner() + " HAS WON";
         g2D.drawString(winPrompt, getWidth() / 2 - metrics.stringWidth(winPrompt) / 2, metrics.getHeight());
-    }
-
-    private void transitionIn(Graphics2D g2D, Game targetGame) {
-        Runnable zoomIn = () -> {
-
-        };
-
-        Scheduler.Preferences loop = new Scheduler.Preferences();
-    }
-
-    private void transitionOut(Graphics g2D, Game targetGame) {
-        Runnable zoomOut = () -> {
-
-        };
-
-        Scheduler.Preferences loop = new Scheduler.Preferences();
     }
 
     private void renderGame(Graphics2D g2D, Game currentGame, Rectangle gameDimensions, int depth) {
@@ -358,7 +339,7 @@ public class Display extends JPanel {
             repaint();
             unlockInputs();
         } );
-        final Scheduler.Preferences animationInfo = new Scheduler.Preferences();
+        final Scheduler.Preferences<Runnable> animationInfo = new Scheduler.Preferences<Runnable>();
         animationInfo.setCancelTime(animation.getTransitionTime());
         animationInfo.setLoopTime(animation.getMillisecondsPerFrame());
         animationInfo.setMainAction(callAnimate);
@@ -369,26 +350,10 @@ public class Display extends JPanel {
         Scheduler.scheduleAtFixedRate(animationInfo);
     }
 
-    private void startDrawOAnimation(Rectangle bounds) {
-        lockInputs();
-    }
-
-    private void startZoomInAnimation(Rectangle target) {
-        lockInputs();
-    }
-
-    private void startZoomOutAnimation() {
-        lockInputs();
-    }
-
     private Rectangle getBoundsFromRowAndCol(int row, int col) {
         int squareWidth = getWidth() / 3;
         int squareHeight = getHeight() / 3;
         return new Rectangle(col * squareWidth, row * squareHeight, squareWidth, squareHeight);
-    }
-
-    private int getSelectionFromRowAndCol(int row, int col) {
-        return (row / 3) + (col % 3);
     }
 
     class MouseActions extends MouseAdapter {
@@ -459,7 +424,6 @@ public class Display extends JPanel {
 
     private abstract class Animation {
         private int maxFrames;
-        private int currentFrame;
         private int transitionTime;
         private Instant lastFrameInstant;
 
@@ -477,12 +441,6 @@ public class Display extends JPanel {
                 lastFrameInstant = Instant.now();
             }
             draw(g2D);
-        }
-
-        public boolean isCompleted() {
-            if (currentFrame >= maxFrames)
-                return true;
-            return false;
         }
 
         public int getTransitionTime() {

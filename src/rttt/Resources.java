@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -71,10 +70,6 @@ public class Resources {
         }
 
         return current;
-    }
-
-    private static BufferedImage getSprite(BufferedImage sheet, int row, int col) {
-        return sheet.getSubimage(col * SPRITESIZE, row * SPRITESIZE, SPRITESIZE, SPRITESIZE);
     }
 
     public static BufferedImage getImage(ImageEnum choice) {
