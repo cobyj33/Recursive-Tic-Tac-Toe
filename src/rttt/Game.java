@@ -1,4 +1,5 @@
-package com.company;
+package rttt;
+
 
 public abstract class Game {
     Player winner;

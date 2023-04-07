@@ -1,9 +1,5 @@
-package com.company.menuScreens;
+package rttt;
 
-import com.company.Display;
-import com.company.GUIResources;
-import com.company.Resources;
-import com.company.TicTacToe;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -12,6 +8,12 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import rttt.GUIResources;
+import rttt.TicTacToe;
+import rttt.Display;
+import rttt.Resources;
+
 
 public class GameConfigScreen extends JPanel {
     JLabel playLabel;
@@ -136,16 +138,6 @@ public class GameConfigScreen extends JPanel {
         });
         startButtonBackground.add(startButton);
         add(startButtonBackground, constraints);
-
-        JPanel footnoteBackground = new LabelBackground();
-        JLabel footnote = GUIResources.createLabel("Note: You will probably not play all these games");
-        ((GUIResources.TextLabel) footnote).setTextColor(Color.CYAN);
-
-        constraints.gridx = 0;
-        constraints.gridy = 3;
-        constraints.gridwidth = 3;
-        footnoteBackground.add(footnote);
-        add(footnoteBackground, constraints);
     }
 
     protected void paintComponent(Graphics g) {

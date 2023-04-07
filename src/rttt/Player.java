@@ -1,4 +1,5 @@
-package com.company;
+package rttt;
+
 
 public enum Player {
     X, O, NONE;

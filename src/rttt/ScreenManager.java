@@ -1,4 +1,5 @@
-package com.company.menuScreens;
+package rttt;
+
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;

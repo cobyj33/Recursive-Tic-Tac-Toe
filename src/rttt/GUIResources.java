@@ -1,4 +1,5 @@
-package com.company;
+package rttt;
+
 
 import java.awt.*;
 import java.awt.event.ComponentAdapter;

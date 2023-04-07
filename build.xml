@@ -1,0 +1,50 @@
+<!-- Recursive-Tic-Tac-Toe Apache Ant Build File -->
+<!-- Author: Jacoby Johnson (cobyj33) (https://github.com/cobyj33)-->
+<!-- In order to run, go to project's root directory and run "ant". Apache Ant must be installed onto the user's system -->
+<!-- The program can then be run by running "java -jar dist/Recursive-Tic-Tac-Toe.jar" -->
+<!-- The program can also simply be compiled with "ant compile", but the files will have to
+    be run from the "build" directory with the command"java main.Main"-->
+
+<project name="Recursive-Tic-Tac-Toe" default="dist" basedir=".">
+    <description>
+        simple example build file
+    </description>
+    <!-- set global properties for this build -->  
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+    <property name="build-res" location="${build}/res"/>
+    <property name="dist" location="dist"/>
+    <property name="res" location="res"/>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}"/>
+        <copy todir="${build-res}" >  
+            <fileset dir="${res}" />
+        </copy>
+    </target>
+
+    <target name="compile" depends="init" description="compile the source">
+        <!-- Compile the Java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${build}"/>
+    </target>
+
+    <target name="dist" depends="compile" description="generate the distribution">
+        <mkdir dir="${dist}" />
+        <!-- Put everything in ${build} into the Recursive-Tic-Tac-Toe.jar file -->
+        <jar jarfile="${dist}/Recursive-Tic-Tac-Toe.jar" basedir="${build}">
+            <manifest>
+                <attribute name="Main-Class" value="rttt.Main" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean" description="clean up">
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+
+</project>

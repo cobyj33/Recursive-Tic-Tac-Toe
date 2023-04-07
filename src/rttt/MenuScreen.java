@@ -1,15 +1,14 @@
-package com.company.menuScreens;
-
-import com.company.AncestorAdapter;
-import com.company.GUIResources;
-import com.company.Resources;
+package rttt;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import rttt.GUIResources;
+import rttt.Resources;
+import rttt.AncestorAdapter;
 
 public class MenuScreen extends JPanel {
     TitleArea title;

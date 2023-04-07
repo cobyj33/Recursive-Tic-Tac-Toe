@@ -1,0 +1,7 @@
+bin
+bin/**
+tags
+tags/**
+tags.*
+build
+dist

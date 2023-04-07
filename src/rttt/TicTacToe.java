@@ -1,5 +1,4 @@
-package com.company;
-
+package rttt;
 import javax.swing.*;
 
 public class TicTacToe {

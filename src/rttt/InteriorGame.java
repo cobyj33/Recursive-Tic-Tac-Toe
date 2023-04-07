@@ -1,4 +1,5 @@
-package com.company;
+package rttt;
+
 
 public class InteriorGame extends Game {
     Game[][] board;

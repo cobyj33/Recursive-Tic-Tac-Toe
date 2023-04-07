@@ -1,8 +1,4 @@
-package com.company;
-
-import com.company.menuScreens.GameConfigScreen;
-import com.company.menuScreens.MenuScreen;
-import com.company.menuScreens.ScreenManager;
+package rttt;
 
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;

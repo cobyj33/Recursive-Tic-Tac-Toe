@@ -1,4 +1,5 @@
-package com.company;
+package rttt;
+
 
 import javax.swing.*;
 import java.awt.*;
